@@ -2,24 +2,20 @@ module button(Clock, Reset, key, feedback);
 	output logic feedback;
 	input logic Clock, Reset, key;
 	
-	enum {on, off} curr_state, next_state;
+	enum {off, on} curr_state, next_state;
 	
+	//set the next state based off of whether the key is pressed
 	always_comb begin
-		case(curr_state)
-			on: 	if(key) next_state = on;
-	
-					else next_state = off;
-				
-			off: 	if(key) next_state = on;
-						
-					else next_state = off;
-			
+		case(key)
+			0:	next_state <= on;
+			1: next_state <= off;
 		endcase
-		
 	end
 	
-	assign feedback = (curr_state == on & next_state == off);
+	//set the output to positive edges of button presses
+	assign feedback = (curr_state == off & next_state == on);
 	
+	//set state in sync with the clock
 	always_ff @(posedge Clock) begin
 		if(Reset) 
 			curr_state <= off;
@@ -28,48 +24,3 @@ module button(Clock, Reset, key, feedback);
 	end
 	
 endmodule
-
-module button_testbench();
-	logic Clock,Reset;
-	logic key;
-	logic feedback;
-	
-	userInput dut (.Clock, .Reset, .feedback, .key);
-	
-	parameter CLOCK_PERIOD = 100;
-	initial begin
-		Clock <= 0;
-		forever #(CLOCK_PERIOD / 2) 
-		Clock <= ~Clock;
-	end
-	
-	initial begin
-		Reset <= 1;						@(posedge Clock);
-											@(posedge Clock);
-		Reset <= 0;						@(posedge Clock);
-											@(posedge Clock);
-		key <= 1;						@(posedge Clock);
-											@(posedge Clock);
-											@(posedge Clock);
-		key <= 0;						@(posedge Clock);
-											@(posedge Clock);
-											@(posedge Clock);
-		key <= 1;						@(posedge Clock);
-											@(posedge Clock);
-											@(posedge Clock);
-		key <= 0; 						@(posedge Clock);
-											@(posedge Clock);
-											@(posedge Clock);
-		key <= 1;						@(posedge Clock);
-											@(posedge Clock);
-											@(posedge Clock);
-		key <= 0; 						@(posedge Clock);
-											@(posedge Clock);
-											@(posedge Clock);
-		key <= 1;						@(posedge Clock);
-											@(posedge Clock);
-		$stop;
-		
-	end
-	
-endmodule 

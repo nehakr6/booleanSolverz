@@ -55,18 +55,3 @@ module LED_test(RST, RedPixels, GrnPixels);
 	end
 
 endmodule
-
-
-module LED_test_testbench();
-
-	logic RST;
-	logic [15:0][15:0] RedPixels, GrnPixels;
-	
-	LED_test dut (.RST, .RedPixels, .GrnPixels);
-	
-	initial begin
-	RST = 1'b1; #10;
-	RST = 1'b0; #10;
-	end
-	
-endmodule
